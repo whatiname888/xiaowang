@@ -1,0 +1,43 @@
+nodes:
+
+  - id: xiaowang_terminal
+    build: pip install -e ../xiaowang_terminal
+    path: dynamic
+    outputs:
+      - data
+      - int_output
+    inputs:
+      agent_generateout: agent_generate/agent_generateout
+      agent_DLCout: agent_DLC/agent_DLCout
+      agent_reflectionout: agent_reflection/agent_reflectionout
+
+  
+  
+  - id: agent_DLC #dynamic layer processing
+    operator:
+      python: scripts/agent_DLC.py
+      inputs:
+        task: xiaowang_terminal/data
+        agent_generateout: agent_generate/agent_generateout
+      outputs:
+        - agent_DLCout
+        - int_output
+        - status
+  
+  - id: agent_generate
+    operator:
+      python: scripts/agent_generate.py
+      inputs:
+        task: agent_DLC/agent_DLCout
+        agent_reflectionout: agent_reflection/agent_reflectionout
+      outputs:
+        - agent_generateout
+  
+  - id: agent_reflection
+    operator:
+      python: scripts/agent_reflection.py
+      inputs:
+        task: agent_generate/agent_generateout
+      outputs:
+        - agent_reflectionout
+
